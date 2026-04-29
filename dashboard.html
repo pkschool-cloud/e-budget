@@ -2,328 +2,2132 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>แดชบอร์ดงบประมาณ - โรงเรียนป่าก้าง</title>
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><?= appName ?></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* ตั้งค่าฟอนต์หลัก */
-    body { 
-      font-family: 'Prompt', sans-serif; 
-      background-color: #f8fafc; /* พื้นหลังสีเทาอมฟ้าสว่างๆ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
+      --primary-light: #eef2ff;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --info: #3b82f6;
+      --info-light: #eff6ff;
+      --purple: #8b5cf6;
+      --purple-light: #f5f3ff;
+      
+      --bg: #f9fafb;
+      --card: #ffffff;
+      --text: #111827;
+      --text-light: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #e5e7eb;
+      --border-light: #f3f4f6;
+      
+      --sidebar-bg: #1e293b;
+      --sidebar-hover: #334155;
+      --sidebar-active: #4f46e5;
+      --sidebar-text: #cbd5e1;
+      --sidebar-text-active: #ffffff;
+      
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+    
+    body {
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    /* ===== LAYOUT ===== */
+    .app {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+    }
+    
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      background: var(--sidebar-bg);
+      color: var(--sidebar-text);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    
+    .sidebar-header {
+      padding: 24px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .brand-text h1 {
+      font-size: 15px;
+      color: white;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .brand-text p {
+      font-size: 11px;
+      color: var(--sidebar-text);
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+    
+    .nav {
+      padding: 16px 12px;
+      flex: 1;
+    }
+    
+    .nav-group { margin-bottom: 4px; }
+    
+    .nav-group-title {
+      padding: 12px 16px 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--sidebar-text);
+      opacity: 0.5;
+      font-weight: 600;
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      color: var(--sidebar-text);
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 2px;
+      font-size: 13.5px;
+      position: relative;
+    }
+    
+    .nav-item:hover {
+      background: var(--sidebar-hover);
+      color: white;
+    }
+    
+    .nav-item.active {
+      background: var(--sidebar-active);
+      color: white;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+    
+    .nav-item .icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    
+    .nav-badge {
+      margin-left: auto;
+      background: var(--danger);
+      color: white;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+    
+    .nav-item.parent {
+      font-weight: 500;
+    }
+    
+    .nav-children {
+      margin-left: 30px;
+      margin-top: 2px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s;
+    }
+    
+    .nav-children.open { max-height: 300px; }
+    
+    .nav-children .nav-item {
+      padding: 8px 16px;
+      font-size: 13px;
+      opacity: 0.85;
+    }
+    
+    .chevron {
+      margin-left: auto;
+      transition: transform 0.2s;
+    }
+    .nav-item.parent.open .chevron { transform: rotate(180deg); }
+    
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+    }
+    
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    
+    .user-info { flex: 1; min-width: 0; }
+    .user-info .name { font-size: 13px; color: white; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-info .role { font-size: 11px; opacity: 0.6; }
+    
+    .btn-logout {
+      width: 28px;
+      height: 28px;
+      background: transparent;
+      border: none;
+      color: var(--sidebar-text);
+      cursor: pointer;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .btn-logout:hover { background: rgba(239,68,68,0.2); color: #ff6b6b; }
+    
+    /* ===== MAIN ===== */
+    .main {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    
+    .topbar {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    
+    .topbar-left h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .topbar-left .breadcrumb {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+    
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .btn {
+      padding: 9px 16px;
+      border-radius: 8px;
+      border: none;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    
+    .btn-secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--bg); }
+    
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #059669; }
+    
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    
+    .btn-warning { background: var(--warning); color: white; }
+    
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-icon { padding: 8px; }
+    
+    .content {
+      padding: 28px;
+      flex: 1;
+    }
+    
+    /* ===== STAT CARDS ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .stat-card .stat-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+    }
+    
+    .stat-card .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    
+    .stat-card .stat-label {
+      font-size: 13px;
+      color: var(--text-light);
+      margin-bottom: 6px;
+    }
+    
+    .stat-card .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    
+    .stat-card .stat-unit {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-left: 4px;
+      font-weight: 400;
+    }
+    
+    .stat-card .stat-change {
+      font-size: 12px;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .stat-receipt .stat-bar { background: var(--success); }
+    .stat-receipt .stat-icon { background: var(--success-light); color: var(--success); }
+    .stat-receipt .stat-value { color: var(--success); }
+    
+    .stat-budget .stat-bar { background: var(--primary); }
+    .stat-budget .stat-icon { background: var(--primary-light); color: var(--primary); }
+    .stat-budget .stat-value { color: var(--primary); }
+    
+    .stat-disburse .stat-bar { background: var(--danger); }
+    .stat-disburse .stat-icon { background: var(--danger-light); color: var(--danger); }
+    .stat-disburse .stat-value { color: var(--danger); }
+    
+    .stat-balance .stat-bar { background: var(--text); }
+    .stat-balance .stat-icon { background: #f3f4f6; color: var(--text); }
+    .stat-balance .stat-value { color: var(--text); }
+    
+    /* ===== CARDS ===== */
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
       overflow: hidden;
     }
     
-    /* ซ่อน Scrollbar แต่ยังเลื่อนได้ */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-    /* อนิเมชั่นต่างๆ */
-    .smooth-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02); }
+    .card-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
     
-    /* แถบเมนูย่อย (Accordion) */
-    .submenu { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out; }
-    .submenu.open { max-height: 200px; }
-    .rotate-icon { transform: rotate(180deg); transition: transform 0.3s ease; }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .card-body { padding: 20px 24px; }
+    
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    
+    /* ===== CHART ===== */
+    .chart-container {
+      position: relative;
+      height: 280px;
+    }
+    
+    /* ===== PROGRESS LIST ===== */
+    .progress-item {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .progress-item:last-child { border-bottom: none; }
+    
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .progress-name {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text);
+      flex: 1;
+      margin-right: 12px;
+    }
+    
+    .progress-pct {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .progress-bar {
+      height: 8px;
+      background: var(--border-light);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--purple));
+      border-radius: 4px;
+      transition: width 0.6s ease;
+    }
+    
+    .progress-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    
+    /* ===== TRANSACTIONS ===== */
+    .txn-item {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .txn-item:last-child { border-bottom: none; }
+    
+    .txn-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .txn-icon.in { background: var(--success-light); color: var(--success); }
+    .txn-icon.out { background: var(--danger-light); color: var(--danger); }
+    
+    .txn-detail { flex: 1; min-width: 0; }
+    .txn-detail .desc { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .txn-detail .date { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    
+    .txn-amount { font-size: 14px; font-weight: 600; }
+    .txn-amount.in { color: var(--success); }
+    .txn-amount.out { color: var(--danger); }
+    
+    /* ===== TABLE ===== */
+    .table-wrap {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    td {
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--text);
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    tr:hover td { background: #fafafa; }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    .badge-draft { background: #f3f4f6; color: #6b7280; }
+    .badge-pending { background: var(--warning-light); color: var(--warning); }
+    .badge-approved { background: var(--success-light); color: var(--success); }
+    .badge-rejected { background: var(--danger-light); color: var(--danger); }
+    .badge-completed { background: var(--info-light); color: var(--info); }
+    
+    .table-actions {
+      display: flex;
+      gap: 6px;
+    }
+    
+    /* ===== FILTERS ===== */
+    .filters {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 16px 24px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 320px;
+    }
+    
+    .search-box input {
+      width: 100%;
+      padding: 9px 12px 9px 36px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      background: white;
+    }
+    
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    }
+    
+    .search-box svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+    
+    select.form-select {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      background: white;
+      cursor: pointer;
+    }
+    
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .modal-overlay.show { display: flex; animation: fadeIn 0.15s; }
+    
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    .modal {
+      background: white;
+      border-radius: 16px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      animation: modalIn 0.2s ease-out;
+    }
+    
+    .modal.modal-lg { max-width: 800px; }
+    
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .modal-title { font-size: 16px; font-weight: 600; }
+    
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-close:hover { background: var(--bg); }
+    
+    .modal-body { padding: 24px; }
+    
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    .form-group-modal {
+      margin-bottom: 16px;
+    }
+    
+    .form-group-modal label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-light);
+      margin-bottom: 6px;
+    }
+    
+    .form-group-modal input,
+    .form-group-modal textarea,
+    .form-group-modal select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    
+    .form-group-modal input:focus,
+    .form-group-modal textarea:focus,
+    .form-group-modal select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    }
+    
+    .form-group-modal textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    /* ===== TOAST ===== */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .toast {
+      padding: 14px 18px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 280px;
+      max-width: 400px;
+      animation: slideIn 0.3s;
+      border-left: 4px solid;
+    }
+    
+    .toast.success { border-color: var(--success); }
+    .toast.success .toast-icon { color: var(--success); }
+    .toast.error { border-color: var(--danger); }
+    .toast.error .toast-icon { color: var(--danger); }
+    .toast.warning { border-color: var(--warning); }
+    .toast.info { border-color: var(--info); }
+    
+    .toast-msg { font-size: 13px; font-weight: 500; flex: 1; }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    /* ===== LOADING ===== */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+    }
+    
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state .icon { width: 56px; height: 56px; margin: 0 auto 16px; opacity: 0.4; }
+    .empty-state .title { font-size: 14px; font-weight: 500; color: var(--text-light); margin-bottom: 4px; }
+    .empty-state .desc { font-size: 12px; }
+    
+    /* ===== PAGE TRANSITIONS ===== */
+    .page { display: none; }
+    .page.active { display: block; animation: fadeIn 0.2s; }
+    
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    
+    @media (max-width: 768px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        z-index: 100;
+        transition: left 0.3s;
+        width: 280px;
+      }
+      .sidebar.open { left: 0; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .content { padding: 16px; }
+    }
+    
+    .menu-toggle {
+      display: none;
+      width: 36px;
+      height: 36px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+    @media (max-width: 768px) { .menu-toggle { display: inline-flex; } }
   </style>
 </head>
-<body class="flex h-screen text-slate-800">
-
-  <aside class="w-72 bg-[#0f172a] text-slate-300 flex flex-col shadow-2xl z-20">
-    <div class="p-6 flex items-center gap-4 border-b border-slate-700/50">
-      <div class="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
-        <i class="fa-solid fa-school-flag text-white text-xl"></i>
-      </div>
-      <div>
-        <h1 class="text-white font-semibold text-lg leading-tight tracking-wide">โรงเรียนป่าก้าง</h1>
-        <p class="text-xs text-indigo-300 mt-0.5">ระบบการเงินสถานศึกษา สพฐ.</p>
-      </div>
-    </div>
-
-    <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-      
-      <div class="mb-4">
-        <button onclick="toggleMenu('menu-overview', 'icon-overview')" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-800 smooth-transition text-slate-200">
-          <div class="flex items-center gap-3">
-            <i class="fa-solid fa-chart-pie w-5 text-center text-indigo-400"></i>
-            <span class="font-medium text-sm">ภาพรวมระบบ</span>
+<body>
+  <div class="app">
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>
+            </svg>
           </div>
-          <i id="icon-overview" class="fa-solid fa-chevron-down text-xs rotate-icon"></i>
-        </button>
-        <div id="menu-overview" class="submenu open pl-11 pr-3 flex flex-col gap-1 mt-1">
-          <a href="#" class="py-2.5 px-3 rounded-lg bg-indigo-500/10 text-indigo-400 font-medium text-sm border-l-2 border-indigo-500 smooth-transition">
+          <div class="brand-text">
+            <h1><?= appName ?></h1>
+            <p><?= schoolName ?></p>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="nav">
+        <div class="nav-group">
+          <div class="nav-group-title">ภาพรวม</div>
+          <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
             แดชบอร์ดงบประมาณ
-          </a>
-        </div>
-      </div>
-
-      <div class="mb-2">
-        <button onclick="toggleMenu('menu-plan', 'icon-plan')" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-800 smooth-transition">
-          <div class="flex items-center gap-3">
-            <i class="fa-solid fa-list-check w-5 text-center text-slate-400"></i>
-            <span class="font-medium text-sm">1. ระบบแผนปฏิบัติการ</span>
           </div>
-          <i id="icon-plan" class="fa-solid fa-chevron-down text-xs"></i>
-        </button>
-        <div id="menu-plan" class="submenu pl-11 pr-3 flex flex-col gap-1 mt-1">
-          <a href="#" class="py-2 px-3 rounded-lg hover:bg-slate-800 hover:text-white text-slate-400 text-sm smooth-transition">1.1 จัดทำโครงการ / ขออนุมัติ</a>
-          <a href="#" class="py-2 px-3 rounded-lg hover:bg-slate-800 hover:text-white text-slate-400 text-sm smooth-transition">1.2 ทะเบียนคุมโครงการ</a>
         </div>
-      </div>
-
-      <div class="mb-2">
-        <button onclick="toggleMenu('menu-finance', 'icon-finance')" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-800 smooth-transition">
-          <div class="flex items-center gap-3">
-            <i class="fa-solid fa-coins w-5 text-center text-slate-400"></i>
-            <span class="font-medium text-sm">2. ระบบการเงิน</span>
+        
+        <div class="nav-group">
+          <div class="nav-group-title">1. ระบบแผนปฏิบัติการ</div>
+          <div class="nav-item" data-page="projects" onclick="navigate('projects')">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            จัดทำโครงการ / ขออนุมัติงบ
           </div>
-          <i id="icon-finance" class="fa-solid fa-chevron-down text-xs"></i>
-        </button>
-        <div id="menu-finance" class="submenu pl-11 pr-3 flex flex-col gap-1 mt-1">
-          <a href="#" class="py-2 px-3 rounded-lg hover:bg-slate-800 hover:text-white text-slate-400 text-sm smooth-transition">2.1 บันทึกรับเงินรายได้</a>
-          <a href="#" class="py-2 px-3 rounded-lg hover:bg-slate-800 hover:text-white text-slate-400 text-sm smooth-transition">2.2 ขออนุมัติเบิกจ่ายเงิน</a>
-        </div>
-      </div>
-
-      <div class="mb-2">
-        <button onclick="toggleMenu('menu-account', 'icon-account')" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-800 smooth-transition">
-          <div class="flex items-center gap-3">
-            <i class="fa-solid fa-book-bookmark w-5 text-center text-slate-400"></i>
-            <span class="font-medium text-sm">3. ระบบบัญชี (อิง 2544)</span>
+          <div class="nav-item" data-page="project-register" onclick="navigate('project-register')">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            ทะเบียนคุมโครงการ
           </div>
-          <i id="icon-account" class="fa-solid fa-chevron-down text-xs"></i>
-        </button>
-        <div id="menu-account" class="submenu pl-11 pr-3 flex flex-col gap-1 mt-1">
-          <a href="#" class="py-2 px-3 rounded-lg hover:bg-slate-800 hover:text-white text-slate-400 text-sm smooth-transition">3.1 ทะเบียนคุมเงินนอกงบฯ</a>
-          <a href="#" class="py-2 px-3 rounded-lg hover:bg-slate-800 hover:text-white text-slate-400 text-sm smooth-transition">3.2 รายงานเงินคงเหลือประจำวัน</a>
+        </div>
+        
+        <div class="nav-group">
+          <div class="nav-group-title">2. ระบบการเงิน</div>
+          <div class="nav-item" data-page="receipts" onclick="navigate('receipts')">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            บันทึกรับเงิน (รายได้)
+          </div>
+          <div class="nav-item" data-page="disbursements" onclick="navigate('disbursements')">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            ขออนุมัติเบิกจ่ายเงิน
+            <span class="nav-badge" id="badge-disburse" style="display:none">0</span>
+          </div>
+        </div>
+        
+        <div class="nav-group">
+          <div class="nav-group-title">3. ระบบบัญชี (คู่มือ 2544)</div>
+          <div class="nav-item" data-page="off-budget" onclick="navigate('off-budget')">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            ทะเบียนคุมเงินนอกงบประมาณ
+          </div>
+          <div class="nav-item" data-page="daily-balance" onclick="navigate('daily-balance')">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            รายงานเงินคงเหลือประจำวัน
+          </div>
+        </div>
+        
+        <div class="nav-group" id="adminNav" style="display:none">
+          <div class="nav-group-title">การจัดการระบบ</div>
+          <div class="nav-item" data-page="users" onclick="navigate('users')">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            จัดการผู้ใช้งาน
+          </div>
+        </div>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="user-card">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="name" id="userName">-</div>
+            <div class="role" id="userRole">-</div>
+          </div>
+          <button class="btn-logout" onclick="logout()" title="ออกจากระบบ">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
         </div>
       </div>
-    </nav>
-  </aside>
-
-  <main class="flex-1 flex flex-col overflow-y-auto relative bg-[#f8fafc]">
+    </aside>
     
-    <header class="bg-white/80 backdrop-blur-lg border-b border-slate-200 sticky top-0 z-10 px-8 py-5 flex justify-between items-center">
-      <div>
-        <h2 class="text-2xl font-bold text-slate-800">แดชบอร์ดงบประมาณ</h2>
-        <p class="text-sm text-slate-500 font-medium mt-1">สรุปภาพรวมทางการเงินและการเบิกจ่ายโครงการ</p>
+    <!-- ===== MAIN ===== -->
+    <main class="main">
+      <div class="topbar">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="topbar-left">
+            <h2 id="pageTitle">แดชบอร์ดงบประมาณ</h2>
+            <div class="breadcrumb" id="pageBreadcrumb">หน้าหลัก</div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-secondary" onclick="refreshData()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            ซิงค์ข้อมูลล่าสุด
+          </button>
+        </div>
       </div>
       
-      <button onclick="syncData()" id="syncBtn" class="flex items-center gap-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white px-5 py-2.5 rounded-full font-medium text-sm smooth-transition border border-indigo-100 hover:border-indigo-600 shadow-sm">
-        <i id="syncIcon" class="fa-solid fa-rotate-right"></i>
-        <span>ซิงค์ข้อมูลล่าสุด</span>
-      </button>
-    </header>
-
-    <div class="p-8 pt-6 max-w-7xl mx-auto w-full">
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="content">
         
-        <div class="bg-white rounded-2xl p-6 border border-slate-100 card-hover smooth-transition relative overflow-hidden group">
-          <div class="absolute right-0 top-0 w-24 h-24 bg-emerald-50 rounded-bl-full -z-10 group-hover:scale-125 smooth-transition"></div>
-          <div class="flex items-center justify-between mb-4">
-            <p class="text-sm font-medium text-slate-500">เงินงบประมาณรับเข้า</p>
-            <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600"><i class="fa-solid fa-arrow-down"></i></div>
-          </div>
-          <h3 class="text-3xl font-bold text-slate-800">1,250,000<span class="text-lg text-slate-400 font-medium">.00</span></h3>
-        </div>
-        
-        <div class="bg-white rounded-2xl p-6 border border-slate-100 card-hover smooth-transition relative overflow-hidden group">
-          <div class="absolute right-0 top-0 w-24 h-24 bg-indigo-50 rounded-bl-full -z-10 group-hover:scale-125 smooth-transition"></div>
-          <div class="flex items-center justify-between mb-4">
-            <p class="text-sm font-medium text-slate-500">ตั้งงบโครงการทั้งหมด</p>
-            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600"><i class="fa-solid fa-folder-open"></i></div>
-          </div>
-          <h3 class="text-3xl font-bold text-slate-800">850,000<span class="text-lg text-slate-400 font-medium">.00</span></h3>
-        </div>
-
-        <div class="bg-white rounded-2xl p-6 border border-slate-100 card-hover smooth-transition relative overflow-hidden group">
-          <div class="absolute right-0 top-0 w-24 h-24 bg-rose-50 rounded-bl-full -z-10 group-hover:scale-125 smooth-transition"></div>
-          <div class="flex items-center justify-between mb-4">
-            <p class="text-sm font-medium text-slate-500">เบิกจ่ายจริงทั้งหมด</p>
-            <div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600"><i class="fa-solid fa-arrow-up"></i></div>
-          </div>
-          <h3 class="text-3xl font-bold text-slate-800">324,500<span class="text-lg text-slate-400 font-medium">.00</span></h3>
-        </div>
-
-        <div class="bg-slate-800 rounded-2xl p-6 border border-slate-700 card-hover smooth-transition relative overflow-hidden shadow-lg">
-          <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
-          <div class="flex items-center justify-between mb-4 relative z-10">
-            <p class="text-sm font-medium text-slate-300">เงินคงเหลือสุทธิบัญชี</p>
-            <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-white border border-slate-600"><i class="fa-solid fa-vault"></i></div>
-          </div>
-          <h3 class="text-3xl font-bold text-white relative z-10">925,500<span class="text-lg text-slate-400 font-medium">.00</span></h3>
-        </div>
-
-      </div>
-      
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-10">
-        
-        <div class="bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
-          <div class="flex justify-between items-center mb-6">
-            <h4 class="text-base font-bold text-slate-800 flex items-center gap-2">
-              <i class="fa-solid fa-chart-bar text-indigo-500"></i> ความคืบหน้าโครงการ (Top 5)
-            </h4>
-            <a href="#" class="text-xs font-medium text-indigo-600 hover:text-indigo-800">ดูทั้งหมด</a>
-          </div>
-          
-          <div class="space-y-6">
-            <div>
-              <div class="flex justify-between items-end mb-2">
-                <span class="text-sm font-medium text-slate-700 truncate pr-4">1. โครงการยกระดับผลสัมฤทธิ์ทางการเรียน O-Net NT และ RT</span>
-                <span class="text-sm font-bold text-indigo-600">85%</span>
+        <!-- ============ PAGE: DASHBOARD ============ -->
+        <div class="page active" id="page-dashboard">
+          <div class="stats-grid">
+            <div class="stat-card stat-receipt">
+              <div class="stat-bar"></div>
+              <div class="stat-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
-              <div class="w-full bg-slate-100 rounded-full h-2.5">
-                <div class="bg-indigo-500 h-2.5 rounded-full" style="width: 85%"></div>
-              </div>
-              <p class="text-xs text-slate-400 mt-1.5">เบิกแล้ว 42,500 / ตั้งงบ 50,000</p>
+              <div class="stat-label">เงินงบประมาณรับเข้า</div>
+              <div class="stat-value" id="stat-receipt">0.00</div>
             </div>
             
-            <div>
-              <div class="flex justify-between items-end mb-2">
-                <span class="text-sm font-medium text-slate-700 truncate pr-4">2. โครงการปรับปรุงภูมิทัศน์และแหล่งเรียนรู้</span>
-                <span class="text-sm font-bold text-indigo-600">60%</span>
+            <div class="stat-card stat-budget">
+              <div class="stat-bar"></div>
+              <div class="stat-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
               </div>
-              <div class="w-full bg-slate-100 rounded-full h-2.5">
-                <div class="bg-indigo-500 h-2.5 rounded-full" style="width: 60%"></div>
-              </div>
-              <p class="text-xs text-slate-400 mt-1.5">เบิกแล้ว 60,000 / ตั้งงบ 100,000</p>
+              <div class="stat-label">ตั้งงบโครงการทั้งหมด</div>
+              <div class="stat-value" id="stat-budget">0.00</div>
             </div>
-
-            <div>
-              <div class="flex justify-between items-end mb-2">
-                <span class="text-sm font-medium text-slate-700 truncate pr-4">3. โครงการสนับสนุนค่าใช้จ่ายในการจัดการศึกษา (เรียนฟรี 15 ปี)</span>
-                <span class="text-sm font-bold text-indigo-600">45%</span>
+            
+            <div class="stat-card stat-disburse">
+              <div class="stat-bar"></div>
+              <div class="stat-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
               </div>
-              <div class="w-full bg-slate-100 rounded-full h-2.5">
-                <div class="bg-indigo-500 h-2.5 rounded-full" style="width: 45%"></div>
+              <div class="stat-label">เบิกจ่ายจริงทั้งหมด</div>
+              <div class="stat-value" id="stat-disburse">0.00</div>
+            </div>
+            
+            <div class="stat-card stat-balance">
+              <div class="stat-bar"></div>
+              <div class="stat-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
               </div>
-              <p class="text-xs text-slate-400 mt-1.5">เบิกแล้ว 135,000 / ตั้งงบ 300,000</p>
+              <div class="stat-label">เงินคงเหลือสุทธิบัญชี</div>
+              <div class="stat-value" id="stat-balance">0.00</div>
+            </div>
+          </div>
+          
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">📊 รายรับ-รายจ่าย 12 เดือนย้อนหลัง</h3>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="chartMonthly"></canvas>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">🥧 สัดส่วนงบประมาณ</h3>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="chartBudget"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">ความคืบหน้าโครงการ (Top 5)</h3>
+              </div>
+              <div class="card-body" id="topProjects">
+                <div class="empty-state"><div class="title">ยังไม่มีข้อมูล</div></div>
+              </div>
+            </div>
+            
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">รายการเคลื่อนไหวล่าสุด 5 รายการ</h3>
+              </div>
+              <div class="card-body" id="recentTxns">
+                <div class="empty-state"><div class="title">ยังไม่มีข้อมูล</div></div>
+              </div>
             </div>
           </div>
         </div>
         
-        <div class="bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
-          <div class="flex justify-between items-center mb-6">
-            <h4 class="text-base font-bold text-slate-800 flex items-center gap-2">
-              <i class="fa-solid fa-clock-rotate-left text-slate-500"></i> รายการเคลื่อนไหวล่าสุด
-            </h4>
-            <a href="#" class="text-xs font-medium text-indigo-600 hover:text-indigo-800">ดูทั้งหมด</a>
-          </div>
-          
-          <div class="space-y-4">
-            
-            <div class="flex justify-between items-center p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 smooth-transition cursor-pointer">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500"><i class="fa-solid fa-file-invoice"></i></div>
-                <div>
-                  <p class="text-sm font-medium text-slate-800">เบิกจ่ายค่าวัสดุการศึกษา (โครงการ O-Net)</p>
-                  <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-calendar-check mr-1"></i>28 เม.ย. 2526 • 10:04</p>
-                </div>
-              </div>
-              <span class="text-sm font-bold text-rose-500">-4,500.00</span>
+        <!-- ============ PAGE: PROJECTS ============ -->
+        <div class="page" id="page-projects">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">📋 จัดทำโครงการ / ขออนุมัติงบ</h3>
+              <button class="btn btn-primary" onclick="openProjectModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                เพิ่มโครงการใหม่
+              </button>
             </div>
-
-            <div class="flex justify-between items-center p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 smooth-transition cursor-pointer">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500"><i class="fa-solid fa-money-bill-transfer"></i></div>
-                <div>
-                  <p class="text-sm font-medium text-slate-800">รับเงินอุดหนุนรายหัว ภาคเรียนที่ 1/2526</p>
-                  <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-calendar-check mr-1"></i>25 เม.ย. 2526 • 14:30</p>
-                </div>
+            <div class="filters">
+              <div class="search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input type="text" id="search-projects" placeholder="ค้นหาโครงการ..." oninput="loadProjects()">
               </div>
-              <span class="text-sm font-bold text-emerald-500">+450,000.00</span>
+              <select class="form-select" id="filter-projects-status" onchange="loadProjects()">
+                <option value="">สถานะทั้งหมด</option>
+                <option value="draft">ร่าง</option>
+                <option value="pending_head">รอหัวหน้าตรวจ</option>
+                <option value="pending_director">รอ ผอ. อนุมัติ</option>
+                <option value="approved">อนุมัติแล้ว</option>
+                <option value="rejected">ตีกลับ</option>
+                <option value="completed">เสร็จสิ้น</option>
+              </select>
             </div>
-
-            <div class="flex justify-between items-center p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 smooth-transition cursor-pointer">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500"><i class="fa-solid fa-chalkboard-user"></i></div>
-                <div>
-                  <p class="text-sm font-medium text-slate-800">เบิกจ่ายค่าตอบแทนวิทยากรภายนอก</p>
-                  <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-calendar-check mr-1"></i>22 เม.ย. 2526 • 09:15</p>
-                </div>
-              </div>
-              <span class="text-sm font-bold text-rose-500">-12,000.00</span>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>รหัส</th>
+                    <th>ชื่อโครงการ</th>
+                    <th>วงเงิน (บาท)</th>
+                    <th>ใช้แล้ว</th>
+                    <th>ปีงบ</th>
+                    <th>สถานะ</th>
+                    <th style="width:200px">การดำเนินการ</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-projects">
+                  <tr><td colspan="7"><div class="loading"><span class="spinner"></span>กำลังโหลด...</div></td></tr>
+                </tbody>
+              </table>
             </div>
-
-            <div class="flex justify-between items-center p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 smooth-transition cursor-pointer">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500"><i class="fa-solid fa-hammer"></i></div>
-                <div>
-                  <p class="text-sm font-medium text-slate-800">จ่ายค่าจ้างเหมาซ่อมแซมอาคารเรียน</p>
-                  <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-calendar-check mr-1"></i>20 เม.ย. 2526 • 11:00</p>
-                </div>
-              </div>
-              <span class="text-sm font-bold text-rose-500">-25,000.00</span>
-            </div>
-
           </div>
         </div>
-
+        
+        <!-- ============ PAGE: PROJECT REGISTER ============ -->
+        <div class="page" id="page-project-register">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">📒 ทะเบียนคุมโครงการ</h3>
+              <button class="btn btn-secondary" onclick="exportTable('reg-projects', 'ทะเบียนคุมโครงการ')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export Excel
+              </button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ลำดับ</th>
+                    <th>รหัสโครงการ</th>
+                    <th>ชื่อโครงการ</th>
+                    <th>แหล่งงบ</th>
+                    <th>วงเงิน</th>
+                    <th>ใช้แล้ว</th>
+                    <th>คงเหลือ</th>
+                    <th>% การใช้</th>
+                    <th>สถานะ</th>
+                  </tr>
+                </thead>
+                <tbody id="reg-projects"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- ============ PAGE: RECEIPTS ============ -->
+        <div class="page" id="page-receipts">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">💰 บันทึกรับเงิน (รายได้)</h3>
+              <button class="btn btn-primary" onclick="openReceiptModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                บันทึกรับเงินใหม่
+              </button>
+            </div>
+            <div class="filters">
+              <div class="search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input type="text" id="search-receipts" placeholder="ค้นหา..." oninput="loadReceipts()">
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>เลขที่เอกสาร</th>
+                    <th>วันที่</th>
+                    <th>รายการ</th>
+                    <th>แหล่งที่มา</th>
+                    <th>จำนวนเงิน</th>
+                    <th>วิธีรับ</th>
+                    <th style="width:120px">การดำเนินการ</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-receipts"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- ============ PAGE: DISBURSEMENTS ============ -->
+        <div class="page" id="page-disbursements">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">💸 ขออนุมัติเบิกจ่ายเงิน</h3>
+              <button class="btn btn-primary" onclick="openDisburseModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                ขอเบิกจ่ายใหม่
+              </button>
+            </div>
+            <div class="filters">
+              <div class="search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input type="text" id="search-disburse" placeholder="ค้นหา..." oninput="loadDisbursements()">
+              </div>
+              <select class="form-select" id="filter-disburse-status" onchange="loadDisbursements()">
+                <option value="">สถานะทั้งหมด</option>
+                <option value="draft">ร่าง</option>
+                <option value="pending_head">รอหัวหน้าตรวจ</option>
+                <option value="pending_director">รอ ผอ. อนุมัติ</option>
+                <option value="completed">เบิกจ่ายแล้ว</option>
+                <option value="rejected">ตีกลับ</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>เลขที่</th>
+                    <th>วันที่</th>
+                    <th>โครงการ</th>
+                    <th>รายการ</th>
+                    <th>ผู้รับเงิน</th>
+                    <th>จำนวน</th>
+                    <th>สถานะ</th>
+                    <th style="width:200px">การดำเนินการ</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-disburse"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- ============ PAGE: OFF-BUDGET ============ -->
+        <div class="page" id="page-off-budget">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">📦 ทะเบียนคุมเงินนอกงบประมาณ</h3>
+              <button class="btn btn-primary" onclick="openOffBudgetModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                เพิ่มรายการ
+              </button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>เลขที่</th>
+                    <th>วันที่</th>
+                    <th>ประเภท</th>
+                    <th>รายการ</th>
+                    <th>รับเข้า</th>
+                    <th>จ่ายออก</th>
+                    <th>คงเหลือ</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-offbudget"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- ============ PAGE: DAILY BALANCE ============ -->
+        <div class="page" id="page-daily-balance">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">📊 รายงานเงินคงเหลือประจำวัน</h3>
+              <button class="btn btn-secondary" onclick="exportTable('tbl-daily', 'รายงานเงินคงเหลือประจำวัน')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export Excel
+              </button>
+            </div>
+            <div class="filters">
+              <label style="font-size:12px; color:var(--text-light)">ตั้งแต่</label>
+              <input type="date" class="form-select" id="daily-from" onchange="loadDailyBalance()">
+              <label style="font-size:12px; color:var(--text-light)">ถึง</label>
+              <input type="date" class="form-select" id="daily-to" onchange="loadDailyBalance()">
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>วันที่</th>
+                    <th>ยอดยกมา</th>
+                    <th>รับเข้า</th>
+                    <th>จ่ายออก</th>
+                    <th>คงเหลือ</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-daily"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- ============ PAGE: USERS ============ -->
+        <div class="page" id="page-users">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">👥 จัดการผู้ใช้งาน</h3>
+              <button class="btn btn-primary" onclick="openUserModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                เพิ่มผู้ใช้
+              </button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ชื่อผู้ใช้</th>
+                    <th>ชื่อ-นามสกุล</th>
+                    <th>บทบาท</th>
+                    <th>แผนก</th>
+                    <th>สถานะ</th>
+                    <th style="width:150px">การดำเนินการ</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-users"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
       </div>
-    </div>
-  </main>
-
+    </main>
+  </div>
+  
+  <!-- ===== MODAL ===== -->
+  <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+    <div class="modal" id="modalContent"></div>
+  </div>
+  
+  <!-- ===== TOAST ===== -->
+  <div class="toast-container" id="toastContainer"></div>
+  
   <script>
-    // ฟังก์ชันยืด-หด แถบเมนูด้านซ้าย (Accordion)
-    function toggleMenu(menuId, iconId) {
-      const menu = document.getElementById(menuId);
-      const icon = document.getElementById(iconId);
+    // ===== STATE =====
+    var TOKEN = '<?= token ?>';
+    var CURRENT_USER = null;
+    var CURRENT_PAGE = 'dashboard';
+    var CHARTS = {};
+    var CACHE = { projects: [], receipts: [], disburse: [], offbudget: [], users: [] };
+    
+    var STATUS_LABELS = {
+      'draft': { text: 'ร่าง', cls: 'badge-draft' },
+      'pending_head': { text: 'รอหัวหน้าตรวจ', cls: 'badge-pending' },
+      'pending_director': { text: 'รอ ผอ. อนุมัติ', cls: 'badge-pending' },
+      'approved': { text: 'อนุมัติแล้ว', cls: 'badge-approved' },
+      'rejected': { text: 'ตีกลับ', cls: 'badge-rejected' },
+      'completed': { text: 'เสร็จสิ้น', cls: 'badge-completed' }
+    };
+    
+    var ROLE_LABELS = {
+      'staff': 'เจ้าหน้าที่',
+      'head': 'หัวหน้าการเงิน',
+      'director': 'ผู้อำนวยการ'
+    };
+    
+    var PAGE_TITLES = {
+      'dashboard': { title: 'แดชบอร์ดงบประมาณ', breadcrumb: 'หน้าหลัก' },
+      'projects': { title: 'จัดทำโครงการ / ขออนุมัติงบ', breadcrumb: '1. ระบบแผนปฏิบัติการ > จัดทำโครงการ' },
+      'project-register': { title: 'ทะเบียนคุมโครงการ', breadcrumb: '1. ระบบแผนปฏิบัติการ > ทะเบียนคุม' },
+      'receipts': { title: 'บันทึกรับเงิน', breadcrumb: '2. ระบบการเงิน > รับเงิน' },
+      'disbursements': { title: 'ขออนุมัติเบิกจ่ายเงิน', breadcrumb: '2. ระบบการเงิน > เบิกจ่าย' },
+      'off-budget': { title: 'ทะเบียนคุมเงินนอกงบประมาณ', breadcrumb: '3. ระบบบัญชี > เงินนอกงบ' },
+      'daily-balance': { title: 'รายงานเงินคงเหลือประจำวัน', breadcrumb: '3. ระบบบัญชี > รายงาน' },
+      'users': { title: 'จัดการผู้ใช้งาน', breadcrumb: 'การจัดการ > ผู้ใช้' }
+    };
+    
+    // ===== INIT =====
+    window.addEventListener('load', function() {
+      if (!TOKEN) {
+        var saved = localStorage.getItem('finance_token') || sessionStorage.getItem('finance_token');
+        if (saved) TOKEN = saved;
+      }
       
-      if (menu.classList.contains('open')) {
-        menu.classList.remove('open');
-        icon.classList.remove('rotate-icon');
-      } else {
-        // ปิดเมนูอื่นก่อน (ถ้าต้องการให้เปิดได้ทีละอัน)
-        document.querySelectorAll('.submenu').forEach(el => el.classList.remove('open'));
-        document.querySelectorAll('.fa-chevron-down').forEach(el => el.classList.remove('rotate-icon'));
-        
-        // เปิดเมนูที่คลิก
-        menu.classList.add('open');
-        icon.classList.add('rotate-icon');
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (!res.success) {
+            window.location.href = '?page=login';
+            return;
+          }
+          CURRENT_USER = res.user;
+          renderUserInfo();
+          loadDashboard();
+        })
+        .withFailureHandler(function(){ window.location.href = '?page=login'; })
+        .getCurrentUser(TOKEN);
+    });
+    
+    function renderUserInfo() {
+      document.getElementById('userName').textContent = CURRENT_USER.fullname || CURRENT_USER.username;
+      document.getElementById('userRole').textContent = ROLE_LABELS[CURRENT_USER.role] || CURRENT_USER.role;
+      document.getElementById('userAvatar').textContent = (CURRENT_USER.fullname || CURRENT_USER.username).charAt(0).toUpperCase();
+      
+      if (CURRENT_USER.role === 'director') {
+        document.getElementById('adminNav').style.display = '';
       }
     }
-
-    // ฟังก์ชันจำลองการโหลดข้อมูล (ปุ่มซิงค์)
-    function syncData() {
-      const btn = document.getElementById('syncBtn');
-      const icon = document.getElementById('syncIcon');
+    
+    function logout() {
+      if (!confirm('ยืนยันออกจากระบบ?')) return;
+      google.script.run.withSuccessHandler(function() {
+        localStorage.removeItem('finance_token');
+        sessionStorage.removeItem('finance_token');
+        window.location.href = '?page=login';
+      }).logout(TOKEN);
+    }
+    
+    // ===== NAVIGATION =====
+    function navigate(page) {
+      CURRENT_PAGE = page;
+      document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+      document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+      var pageEl = document.getElementById('page-' + page);
+      if (pageEl) pageEl.classList.add('active');
+      var navEl = document.querySelector('.nav-item[data-page="' + page + '"]');
+      if (navEl) navEl.classList.add('active');
       
-      // เพิ่มคลาสให้ไอคอนหมุน
-      icon.classList.add('fa-spin');
-      btn.classList.add('opacity-80');
+      var info = PAGE_TITLES[page];
+      if (info) {
+        document.getElementById('pageTitle').textContent = info.title;
+        document.getElementById('pageBreadcrumb').textContent = info.breadcrumb;
+      }
       
-      // จำลองเวลาโหลด 1 วินาที
-      setTimeout(() => {
-        icon.classList.remove('fa-spin');
-        btn.classList.remove('opacity-80');
-        
-        // แสดง Alert เล็กๆ มุมขวาบนแบบ Tailwind (จำลอง)
-        const toast = document.createElement('div');
-        toast.className = 'fixed top-5 right-5 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg font-medium text-sm smooth-transition z-50 transform translate-y-[-20px] opacity-0';
-        toast.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i> อัปเดตข้อมูลล่าสุดสำเร็จ';
-        document.body.appendChild(toast);
-        
-        // แอนิเมชั่น Toast โผล่มา
-        setTimeout(() => {
-          toast.classList.remove('translate-y-[-20px]', 'opacity-0');
-        }, 10);
-        
-        // แอนิเมชั่น Toast หายไป
-        setTimeout(() => {
-          toast.classList.add('translate-y-[-20px]', 'opacity-0');
-          setTimeout(() => toast.remove(), 300);
-        }, 3000);
-        
-      }, 1000);
+      // Load data for page
+      switch(page) {
+        case 'dashboard': loadDashboard(); break;
+        case 'projects': loadProjects(); break;
+        case 'project-register': loadProjectRegister(); break;
+        case 'receipts': loadReceipts(); break;
+        case 'disbursements': loadDisbursements(); break;
+        case 'off-budget': loadOffBudget(); break;
+        case 'daily-balance': loadDailyBalance(); break;
+        case 'users': loadUsers(); break;
+      }
+      
+      if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('open');
+      }
+    }
+    
+    function refreshData() {
+      navigate(CURRENT_PAGE);
+      toast('ซิงค์ข้อมูลล่าสุดแล้ว', 'success');
+    }
+    
+    // ===== DASHBOARD =====
+    function loadDashboard() {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (!res.success) { toast(res.message, 'error'); return; }
+          renderDashboard(res.data);
+        })
+        .getDashboardData(TOKEN);
+    }
+    
+    function renderDashboard(data) {
+      // Stat cards
+      document.getElementById('stat-receipt').textContent = fmtMoney(data.summary.totalReceipt);
+      document.getElementById('stat-budget').textContent = fmtMoney(data.summary.totalBudget);
+      document.getElementById('stat-disburse').textContent = fmtMoney(data.summary.totalDisbursed);
+      document.getElementById('stat-balance').textContent = fmtMoney(data.summary.balance);
+      
+      // Top projects
+      var topEl = document.getElementById('topProjects');
+      if (!data.topProjects.length) {
+        topEl.innerHTML = '<div class="empty-state"><div class="title">ยังไม่มีโครงการ</div></div>';
+      } else {
+        topEl.innerHTML = data.topProjects.map(function(p) {
+          return '<div class="progress-item">' +
+            '<div class="progress-head">' +
+              '<div class="progress-name">' + escape(p.name) + '</div>' +
+              '<div class="progress-pct">' + p.progress.toFixed(1) + '%</div>' +
+            '</div>' +
+            '<div class="progress-bar"><div class="progress-fill" style="width:' + Math.min(p.progress, 100) + '%"></div></div>' +
+            '<div class="progress-meta">ใช้ ' + fmtMoney(p.used) + ' / ' + fmtMoney(p.budget) + '</div>' +
+          '</div>';
+        }).join('');
+      }
+      
+      // Recent transactions
+      var txnEl = document.getElementById('recentTxns');
+      if (!data.recentTransactions.length) {
+        txnEl.innerHTML = '<div class="empty-state"><div class="title">ยังไม่มีรายการ</div></div>';
+      } else {
+        txnEl.innerHTML = data.recentTransactions.map(function(t) {
+          var isIn = t.type === 'receipt';
+          return '<div class="txn-item">' +
+            '<div class="txn-icon ' + (isIn ? 'in' : 'out') + '">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">' +
+                (isIn ? '<polyline points="6 9 12 15 18 9"/>' : '<polyline points="18 15 12 9 6 15"/>') +
+              '</svg>' +
+            '</div>' +
+            '<div class="txn-detail">' +
+              '<div class="desc">' + escape(t.description || '-') + '</div>' +
+              '<div class="date">' + fmtDate(t.date) + '</div>' +
+            '</div>' +
+            '<div class="txn-amount ' + (isIn ? 'in' : 'out') + '">' + (isIn ? '+' : '') + fmtMoney(t.amount) + '</div>' +
+          '</div>';
+        }).join('');
+      }
+      
+      // Charts
+      renderMonthlyChart(data.monthlyChart);
+      renderBudgetChart(data.budgetByProject);
+      
+      // Pending badge
+      if (data.pendingCount > 0 && (CURRENT_USER.role === 'head' || CURRENT_USER.role === 'director')) {
+        var badge = document.getElementById('badge-disburse');
+        badge.textContent = data.pendingCount;
+        badge.style.display = '';
+      }
+    }
+    
+    function renderMonthlyChart(monthly) {
+      var ctx = document.getElementById('chartMonthly').getContext('2d');
+      if (CHARTS.monthly) CHARTS.monthly.destroy();
+      
+      CHARTS.monthly = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: monthly.map(function(m) { return m.label; }),
+          datasets: [
+            { label: 'รับเข้า', data: monthly.map(function(m) { return m.income; }), backgroundColor: 'rgba(16, 185, 129, 0.85)', borderRadius: 6 },
+            { label: 'จ่ายออก', data: monthly.map(function(m) { return m.expense; }), backgroundColor: 'rgba(239, 68, 68, 0.85)', borderRadius: 6 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { font: { family: 'IBM Plex Sans Thai', size: 12 }, usePointStyle: true } },
+            tooltip: { callbacks: { label: function(c) { return c.dataset.label + ': ' + fmtMoney(c.parsed.y) + ' บาท'; } } }
+          },
+          scales: {
+            y: { ticks: { callback: function(v) { return v.toLocaleString(); }, font: { family: 'IBM Plex Sans Thai' } }, grid: { color: '#f3f4f6' } },
+            x: { ticks: { font: { family: 'IBM Plex Sans Thai' } }, grid: { display: false } }
+          }
+        }
+      });
+    }
+    
+    function renderBudgetChart(budgetData) {
+      var ctx = document.getElementById('chartBudget').getContext('2d');
+      if (CHARTS.budget) CHARTS.budget.destroy();
+      
+      if (!budgetData.length) {
+        ctx.canvas.parentElement.innerHTML = '<div class="empty-state"><div class="title">ยังไม่มีข้อมูล</div></div>';
+        return;
+      }
+      
+      CHARTS.budget = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: budgetData.map(function(b) { return b.name; }),
+          datasets: [{
+            data: budgetData.map(function(b) { return b.value; }),
+            backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { font: { family: 'IBM Plex Sans Thai', size: 11 }, padding: 12, usePointStyle: true } },
+            tooltip: { callbacks: { label: function(c) { return c.label + ': ' + fmtMoney(c.parsed) + ' บาท'; } } }
+          }
+        }
+      });
+    }
+    
+    // ===== PROJECTS =====
+    function loadProjects() {
+      var tbody = document.getElementById('tbl-projects');
+      tbody.innerHTML = '<tr><td colspan="7"><div class="loading"><span class="spinner"></span>กำลังโหลด...</div></td></tr>';
+      
+      var filter = {
+        search: document.getElementById('search-projects').value,
+        status: document.getElementById('filter-projects-status').value
+      };
+      
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (!res.success) { toast(res.message, 'error'); return; }
+          CACHE.projects = res.data;
+          renderProjectsTable(res.data);
+        })
+        .getProjects(TOKEN, filter);
+    }
+    
+    function renderProjectsTable(items) {
+      var tbody = document.getElementById('tbl-projects');
+      if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="title">ยังไม่มีโครงการ</div><div class="desc">คลิก "เพิ่มโครงการใหม่" เพื่อเริ่มต้น</div></div></td></tr>';
+        return;
+      }
+      tbody.innerHTML = items.map(function(p) {
+        var st = STATUS_LABELS[p.status] || { text: p.status, cls: 'badge-draft' };
+        return '<tr>' +
+          '<td><strong>' + escape(p.code) + '</strong></td>' +
+          '<td>' + escape(p.name) + '</td>' +
+          '<td>' + fmtMoney(p.budget_amount) + '</td>' +
+          '<td>' + fmtMoney(p.used_amount || 0) + '</td>' +
+          '<td>' + (p.fiscal_year || '-') + '</td>' +
+          '<td><span class="badge ' + st.cls + '">' + st.text + '</span></td>' +
+          '<td><div class="table-actions">' + buildProjectActions(p) + '</div></td>' +
+        '</tr>';
+      }).join('');
+    }
+    
+    function buildProjectActions(p) {
+      var html = '';
+      // ดู PDF
+      html += '<button class="btn btn-secondary btn-sm" onclick="exportProjectPdf(\'' + p.id + '\')" title="พิมพ์ PDF"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>';
+      
+      // เจ้าหน้าที่: แก้ไข + ส่งขออนุมัติ + ลบ (เฉพาะร่าง)
+      if (p.status === 'draft' && (CURRENT_USER.role === 'staff' || CURRENT_USER.username === p.created_by)) {
+        html += '<button class="btn btn-primary btn-sm" onclick="openProjectModal(\'' + p.id + '\')">แก้ไข</button>';
+        html += '<button class="btn btn-success btn-sm" onclick="submitProject(\'' + p.id + '\')">ส่งอนุมัติ</button>';
+      }
+      
+      // หัวหน้า/ผอ. อนุมัติ
+      if ((CURRENT_USER.role === 'head' && p.status === 'pending_head') ||
+          (CURRENT_USER.role === 'director' && p.status === 'pending_director')) {
+        html += '<button class="btn btn-success btn-sm" onclick="approveProject(\'' + p.id + '\', true)">อนุมัติ</button>';
+        html += '<button class="btn btn-danger btn-sm" onclick="approveProject(\'' + p.id + '\', false)">ตีกลับ</button>';
+      }
+      
+      return html;
+    }
+    
+    function openProjectModal(id) {
+      var p = id ? CACHE.projects.find(function(x) { return x.id === id; }) : {};
+      if (!p) p = {};
+      
+      var html = '<div class="modal-header">' +
+        '<h3 class="modal-title">' + (id ? 'แก้ไขโครงการ' : 'สร้างโครงการใหม่') + '</h3>' +
+        '<button class="modal-close" onclick="closeModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
+      '</div>' +
+      '<div class="modal-body">' +
+        '<div class="form-row">' +
+          '<div class="form-group-modal"><label>รหัสโครงการ (อัตโนมัติถ้าเว้นว่าง)</label><input id="m-code" value="' + (p.code || '') + '"></div>' +
+          '<div class="form-group-modal"><label>ปีงบประมาณ</label><input id="m-year" type="number" value="' + (p.fiscal_year || (new Date().getFullYear() + 543)) + '"></div>' +
+        '</div>' +
+        '<div class="form-group-modal"><label>ชื่อโครงการ *</label><input id="m-name" value="' + (p.name || '') + '"></div>' +
+        '<div class="form-group-modal"><label>รายละเอียด</label><textarea id="m-desc">' + (p.description || '') + '</textarea></div>' +
+        '<div class="form-row">' +
+          '<div class="form-group-modal"><label>แหล่งงบประมาณ</label><select id="m-source"><option value="งบอุดหนุน">งบอุดหนุน</option><option value="งบลงทุน">งบลงทุน</option><option value="งบดำเนินงาน">งบดำเนินงาน</option><option value="เงินนอกงบประมาณ">เงินนอกงบประมาณ</option><option value="อื่นๆ">อื่นๆ</option></select></div>' +
+          '<div class="form-group-modal"><label>วงเงิน (บาท) *</label><input id="m-budget" type="number" step="0.01" value="' + (p.budget_amount || 0) + '"></div>' +
+        '</div>' +
+        '<div class="form-row">' +
+          '<div class="form-group-modal"><label>วันที่เริ่ม</label><input id="m-start" type="date" value="' + fmtDateInput(p.start_date) + '"></div>' +
+          '<div class="form-group-modal"><label>วันที่สิ้นสุด</label><input id="m-end" type="date" value="' + fmtDateInput(p.end_date) + '"></div>' +
+        '</div>' +
+        '<div class="form-group-modal"><label>ผู้รับผิดชอบ</label><input id="m-resp" value="' + (p.responsible || '') + '"></div>' +
+      '</div>' +
+      '<div class="modal-footer">' +
+        '<button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>' +
+        '<button class="btn btn-primary" onclick="saveProject(\'' + (id || '') + '\')">บันทึก</button>' +
+      '</div>';
+      
+      showModal(html);
+      if (p.budget_source) document.getElementById('m-source').value = p.budget_source;
+    }
+    
+    function saveProject(id) {
+      var data = {
+        id: id || null,
+        code: document.getElementById('m-code').value.trim(),
+        name: document.getElementById('m-name').value.trim(),
+        description: document.getElementById('m-desc').value.trim(),
+        budget_source: document.getElementById('m-source').value,
+        budget_amount: parseFloat(document.getElementById('m-budget').value) || 0,
+        fiscal_year: document.getElementById('m-year').value,
+        start_date: document.getElementById('m-start').value,
+        end_date: document.getElementById('m-end').value,
+        responsible: document.getElementById('m-resp').value.trim()
+      };
+      
+      if (!data.name) { toast('กรุณาระบุชื่อโครงการ', 'error'); return; }
+      if (!data.budget_amount || data.budget_amount <= 0) { toast('กรุณาระบุวงเงิน', 'error'); return; }
+      
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success) { toast(res.message, 'success'); closeModal(); loadProjects(); }
+        else toast(res.message, 'error');
+      }).saveProject(TOKEN, data);
+    }
+    
+    function submitProject(id) {
+      if (!confirm('ยืนยันส่งโครงการนี้เพื่อขออนุมัติ?')) return;
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success) { toast(res.message, 'success'); loadProjects(); }
+        else toast(res.message, 'error');
+      }).submitProject(TOKEN, id);
+    }
+    
+    function approveProject(id, approve) {
+      var note = approve ? '' : prompt('เหตุผลการตีกลับ:');
+      if (!approve && note === null) return;
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success) { toast(res.message, 'success'); loadProjects(); }
+        else toast(res.message, 'error');
+      }).approveProject(TOKEN, id, approve, note);
+    }
+    
+    function exportProjectPdf(id) {
+      toast('กำลังสร้าง PDF...', 'info');
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success) { window.open(res.url, '_blank'); toast('สร้าง PDF สำเร็จ', 'success'); }
+        else toast(res.message, 'error');
+      }).generateProjectPdf(TOKEN, id);
+    }
+    
+    function loadProjectRegister() {
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res.success) return;
+        var items = res.data.filter(function(p) { return p.status === 'approved' || p.status === 'completed'; });
+        var tbody = document.getElementById('reg-projects');
+        if (!items.length) {
+          tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="title">ยังไม่มีโครงการที่อนุมัติแล้ว</div></div></td></tr>';
+          return;
+        }
+        tbody.innerHTML = items.map(function(p, i) {
+          var budget = parseFloat(p.budget_amount) || 0;
+          var used = parseFloat(p.used_amount) || 0;
+          var remain = budget - used;
+          var pct = budget > 0 ? (used / budget * 100) : 0;
+          var st = STATUS_LABELS[p.status];
+          return '<tr><td>' + (i+1) + '</td><td>' + escape(p.code) + '</td><td>' + escape(p.name) + '</td><td>' + escape(p.budget_source || '-') + '</td><td>' + fmtMoney(budget) + '</td><td>' + fmtMoney(used) + '</td><td>' + fmtMoney(remain) + '</td><td>' + pct.toFixed(1) + '%</td><td><span class="badge ' + st.cls + '">' + st.text + '</span></td></tr>';
+        }).join('');
+      }).getProjects(TOKEN, {});
+    }
+    
+    // ===== RECEIPTS =====
+    function loadReceipts() {
+      var tbody = document.getElementById('tbl-receipts');
+      tbody.innerHTML = '<tr><td colspan="7"><div class="loading"><span class="spinner"></span>กำลังโหลด...</div></td></tr>';
+      var filter = { search: document.getElementById('search-receipts').value };
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res.success) { toast(res.message, 'error'); return; }
+        CACHE.receipts = res.data;
+        if (!res.data.length) {
+          tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="title">ยังไม่มีรายการรับเงิน</div></div></td></tr>';
+          return;
+        }
+        tbody.innerHTML = res.data.map(function(r) {
+          return '<tr>' +
+            '<td><strong>' + escape(r.doc_no) + '</strong></td>' +
+            '<td>' + fmtDate(r.receipt_date) + '</td>' +
+            '<td>' + escape(r.description || '-') + '</td>' +
+            '<td>' + escape(r.source || '-') + '</td>' +
+            '<td style="color:var(--success);font-weight:600">' + fmtMoney(r.amount) + '</td>' +
+            '<td>' + escape(r.payment_method || '-') + '</td>' +
+            '<td><div class="table-actions">' +
+              '<button class="btn btn-primary btn-sm" onclick="openReceiptModal(\'' + r.id + '\')">แก้ไข</button>' +
+              (CURRENT_USER.role !== 'staff' ? '<button class="btn btn-danger btn-sm" onclick="deleteReceipt(\'' + r.id + '\')">ลบ</button>' : '') +
+            '</div></td>' +
+          '</tr>';
+        }).join('');
+      }).getReceipts(TOKEN, filter);
+    }
+    
+    function openReceiptModal(id) {
+      var r = id ? CACHE.receipts.find(function(x) { return x.id === id; }) : {};
+      if (!r) r = {};
+      var html = '<div class="modal-header">' +
+        '<h3 class="modal-title">' + (id ? 'แก้ไขการรับเงิน' : 'บันทึกรับเงินใหม่') + '</h3>' +
+        '<button class="modal-close" onclick="closeModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
+      '</div><div class="modal-body">' +
+        '<div class="form-row">' +
+          '<div class="form-group-modal"><label>วันที่รับเงิน *</label><input id="r-date" type="date" value="' + fmtDateInput(r.receipt_date || new Date()) + '"></div>' +
+          '<div class="form-group-modal"><label>จำนวนเงิน *</label><input id="r-amount" type="number" step="0.01" value="' + (r.amount || '') + '"></div>' +
+        '</div>' +
+        '<div class="form-group-modal"><label>รายการ *</label><input id="r-desc" value="' + (r.description || '') + '"></div>' +
+        '<div class="form-row">' +
+          '<div class="form-group-modal"><label>แหล่งที่มา</label><select id="r-source"><option value="งบอุดหนุน">งบอุดหนุน</option><option value="ค่าธรรมเนียม">ค่าธรรมเนียม</option><option value="เงินบริจาค">เงินบริจาค</option><option value="รายได้อื่น">รายได้อื่น</option></select></div>' +
+          '<div class="form-group-modal"><label>วิธีรับ</label><select id="r-method"><option value="เงินสด">เงินสด</option><option value="โอน">โอนเงิน</option><option value="เช็ค">เช็ค</option></select></div>' +
+        '</div>' +
+        '<div class="form-group-modal"><label>เลขที่อ้างอิง</label><input id="r-ref" value="' + (r.reference || '') + '"></div>' +
+      '</div><div class="modal-footer">' +
+        '<button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>' +
+        '<button class="btn btn-primary" onclick="saveReceipt(\'' + (id || '') + '\')">บันทึก</button>' +
+      '</div>';
+      showModal(html);
+      if (r.source) document.getElementById('r-source').value = r.source;
+      if (r.payment_method) document.getElementById('r-method').value = r.payment_method;
+    }
+    
+    function saveReceipt(id) {
+      var data = {
+        id: id || null,
+        receipt_date: document.getElementById('r-date').value,
+        description: document.getElementById('r-desc').value.trim(),
+        source: document.getElementById('r-source').value,
+        amount: parseFloat(document.getElementById('r-amount').value) || 0,
+        payment_method: document.getElementById('r-method').value,
+        reference: document.getElementById('r-ref').value.trim()
+      };
+      if (!data.description) { toast('กรุณาระบุรายการ', 'error'); return; }
+      if (!data.amount) { toast('กรุณาระบุจำนวนเงิน', 'error'); return; }
+      
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success) { toast(res.message, 'success'); closeModal(); loadReceipts(); }
+        else toast(res.message, 'error');
+      }).saveReceipt(TOKEN, data);
+    }
+    
+    function deleteReceipt(id) {
+      if (!confirm('ยืนยันลบรายการนี้?')) return;
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success) { toast(res.message, 'success'); loadReceipts(); }
+        else toast(res.message, 'error');
+      }).deleteReceipt(TOKEN, id);
+    }
+    
+    // ===== DISBURSEMENTS =====
+    function loadDisbursements() {
+      var tbody = document.getElementById('tbl-disburse');
+      tbody.innerHTML = '<tr><td colspan="8"><div class="loading"><span class="spinner"></span>กำลังโหลด...</div></td></tr>';
+      var filter = {
+        search: document.getElementById('search-disburse').value,
+        status: document.getElementById('filter-disburse-status').value
+      };
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res.success) { toast(res.message, 'error'); return; }
+        CACHE.disburse = res.data;
+        if (!res.data.length) {
+          tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="title">ยังไม่มีรายการเบิกจ่าย</div></div></td></tr>';
+          return;
+        }
+        tbody.innerHTML = res.data.map(function(d) {
+          var st = STATUS_LABELS[d.status] || { text: d.status, cls: 'badge-draft' };
+          var projName = '';
+          var proj = CACHE.projects.find(function(p) { return p.id === d.project_id; });
+          if (proj) projName = proj.name;
+          
+          return '<tr>' +
+            '<td><strong>' + escape(d.doc_no) + '</strong></td>' +
+            '<td>' + fmtDate(d.request_date) + '</td>' +
+            '<td>' + escape(projName || '-') + '</td>' +
+            '<td>' + escape(d.description || '-') + '</td>' +
+            '<td>' + escape(d.payee || '-') + '</td>' +
+            '<td style="color:var(--danger);font-weight:600">' + fmtMoney(d.amount) + '</td>' +
+            '<td><span class="badge ' + st.cls + '">' + st.text + '</span></td>' +
+            '<td><div class="table-actions">' + buildDisburseActions(d) + '</div></td>' +
+          '</tr>';
+        }).join('');
+      }).getDisbursements(TOKEN, filter);
+    }
+    
+    function buildDisburseActions(d) {
+      var html = '';
+      if (d.status === 'draft' && (CURRENT_USER.role === 'staff' || CURRENT_USER.username === d.created_by)) {
+        html += '<button class="btn btn-primary btn-sm" onclick="openDisburseModal(\'' + d.id + '\')">แก้ไข</button>';
+        html += '<button class="btn btn-success btn-sm" onclick="submitDisbursement(\'' + d.id + '\')">ส่งอนุมัติ</button>';
+      }
+      if ((CURRENT_USER.role === 'head' && d.status === 'pending_head') ||
+          (CURRENT_USER.role === 'director' && d.status === 'pending_director')) {
+        html += '<button class="btn btn-success btn-sm" onclick="approveDisburse(\'' + d.id + '\', true)">อนุมัติ</button>';
+        html += '<button class="btn btn-danger btn-sm" onclick="approveDisburse(\'' + d.id + '\', false)">ตีกลับ</button>';
+      }
+      return html;
+    }
+    
+    function openDisburseModal(id) {
+      var d = id ? CACHE.disburse.find(function(x) { return x.id === id; }) : {};
+      if (!d) d = {};
+      
+      var approvedProjects = CACHE.projects.filter(function(p) { return p.status === 'approved'; });
+      
+      // ถ้ายังไม่ได้โหลดโครงการ ให้โหลดก่อน
+      if (!approvedProjects.length) {
+        google.script.run.withSuccessHandler(function(res) {
+          if (res.success) {
+            CACHE.projects = res.data;
+            openDisburseModal(id);
+          }
+        }).getProjects(TOKEN, { status: 'approved' });
+        return;
+      }
+      
+      var projOpts = '<option value="">-- เลือกโครงการ --</option>' + approvedProjects.map(function(p) {
+        return '<option value="' + p.id + '"' + (d.project_id === p.id ? ' selected' : '') + '>' + escape(p.name) + ' (เหลือ ' + fmtMoney((p.budget_amount || 0) - (p.used_amount || 0)) + ')</option>';
+      }).join('');
+      
+      var html = '<div class="modal-header">' +
+        '<h3 class="modal-title">' + (id ? 'แก้ไขการเบิกจ่าย' : 'ขอเบิกจ่ายเงินใหม่') + '</h3>' +
+        '<button class="modal-close" onclick="closeModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
+      '</div><div class="modal-body">' +
+        '<div class="form-row">' +
+          '<div class="form-group-modal"><label>วันที่ขอเบิก *</label><input id="d-date" type="date" value="' + fmtDateInput(d.request_date || new Date()) + '"></div>' +
+          '<div class="form-group-modal"><label>จำนวนเงิน *</label><input id="d-amount" type="number" step="0.01" value="' + (d.amount || '') + '"></div>' +
+        '</div>' +
+        '<div class="form-group-modal"><label>โครงการที่เบิก *</label><select id="d-project">' + projOpts + '</select></div>' +
+        '<div class="form-group-modal"><label>รายการ *</label><input id="d-desc" value="' + (d.description || '') + '"></div>' +
+        '<div class="form-row">' +
+          '<div class="form-group-modal"><label>ผู้รับเงิน</label><input id="d-payee" value="' + (d.payee || '') + '"></div>' +
+          '<div class="form-group-modal"><label>หมวด</label><select id="d-cat"><option value="ค่าวัสดุ">ค่าวัสดุ</option><option value="ค่าใช้สอย">ค่าใช้สอย</option><option value="ค่าตอบแทน">ค่าตอบแทน</option><option value="ค่าครุภัณฑ์">ค่าครุภัณฑ์</option><option value="อื่นๆ">อื่นๆ</option></select></div>' +
+        '</div>' +
+      '</div><div class="modal-footer">' +
+        '<button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>' +
+        '<button class="btn btn-primary" onclick="saveDisburse(\'' + (id || '') + '\')">บันทึก</button>' +
+      '</div>';
+      showModal(html);
+      if (d.category) document.getElementById('d-cat').value = d.category;
+    }
+    
+    function saveDisburse(id) {
+      var data = {
+        id: id || null,
+        request_date: document.getElementById('d-date').value,
+        project_id: document.getElementById('d-project').value,
+        description: document.getElementById('d-desc').value.trim(),
+        amount: parseFloat(document.getElementById('d-amount').value) || 0,
+        payee: document.getElementById('d-payee').value.trim(),
+        category: document.getElementById('d-cat').value
+      };
+      if (!data.project_id) { toast('กรุณาเลือกโครงการ', 'error'); return; }
+      if (!data.description) { toast('กรุณาระบุรายการ', 'error'); return; }
+      if (!data.amount) { toast('กรุณาระบุจำนวนเงิน', 'error'); return; }
+      
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success) { toast(res.message, 'success'); closeModal(); loadDisbursements(); }
+        else toast(res.message, 'error');
+      }).saveDisbursement(TOKEN, data);
+    }
+    
+    function submitDisbursement(id) {
+      if (!confirm('ยืนยันส่งขออนุมัติเบิกจ่าย?')) return;
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success) { toast(res.message, 'success'); loadDisbursements(); }
+        else toast(res.message, 'error');
+      }).submitDisbursement(TOKEN, id);
+    }
+    
+    function approveDisburse(id, approve) {
+      var note = approve ? '' : prompt('เหตุผลการตีกลับ:');
+      if (!approve && note === null) return;
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success) { toast(res.message, 'success'); loadDisbursements(); }
+        else toast(res.message, 'error');
+      }).approveDisbursement(TOKEN, id, approve, note);
+    }
+    
+    // ===== OFF-BUDGET =====
+    function loadOffBudget() {
+      var tbody = document.getElementById('tbl-offbudget');
+      tbody.innerHTML = '<tr><td colspan="7"><div class="loading"><span class="spinner"></span>กำลังโหลด...</div></td></tr>';
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res.success) return;
+        CACHE.offbudget = res.data;
+        if (!res.data.length) {
+          tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="title">ยังไม่มีรายการ</div></div></td></tr>';
+          return;
+        }
+        tbody.innerHTML = res.data.map(function(o) {
+          return '<tr>' +
+            '<td><strong>' + escape(o.doc_no) + '</strong></td>' +
+            '<td>' + fmtDate(o.date) + '</td>' +
+            '<td>' + escape(o.type || '-') + '</td>' +
+            '<td>' + escape(o.description || '-') + '</td>' +
+            '<td style="color:var(--success)">' + (parseFloat(o.amount_in) ? fmtMoney(o.amount_in) : '-') + '</td>' +
+            '<td style="color:var(--danger)">' + (parseFloat(o.amount_out) ? fmtMoney(o.amount_out) : '-') + '</td>' +
+            '<td><strong>' + fmtMoney(o.balance) + '</strong></td>' +
+          '</tr>';
+        }).join('');
+      }).getOffBudget(TOKEN, {});
+    }
+    
+    function openOffBudgetModal() {
+      var html = '<div class="modal-header">' +
+        '<h3 class="modal-title">เพิ่มรายการเงินนอกงบประมาณ</h3>' +
+        '<button class="modal-close" onclick="closeModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
+      '</div><div class="modal-body">' +
+        '<div class="form-row">' +
+          '<div class="form-group-modal"><label>วันที่ *</label><input id="o-date" type="date" value="' + fmtDateInput(new Date()) + '"></div>' +
+          '<div class="form-group-modal"><label>ประเภท</label><select id="o-type"><option value="เงินบริจาค">เงินบริจาค</option><option value="เงินกิจกรรม">เงินกิจกรรม</option><option value="เงินประกันสัญญา">เงินประกันสัญญา</option><option value="อื่นๆ">อื่นๆ</option></select></div>' +
+        '</div>' +
+        '<div class="form-group-modal"><label>รายการ *</label><input id="o-desc"></div>' +
+        '<div class="form-row">' +
+          '<div class="form-group-modal"><label>รับเข้า</label><input id="o-in" type="number" step="0.01" value="0"></div>' +
+          '<div class="form-group-modal"><label>จ่ายออก</label><input id="o-out" type="number" step="0.01" value="0"></div>' +
+        '</div>' +
+      '</div><div class="modal-footer">' +
+        '<button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>' +
+        '<button class="btn btn-primary" onclick="saveOffBudget()">บันทึก</button>' +
+      '</div>';
+      showModal(html);
+    }
+    
+    function saveOffBudget() {
+      var data = {
+        date: document.getElementById('o-date').value,
+        type: document.getElementById('o-type').value,
+        description: document.getElementById('o-desc').value.trim(),
+        amount_in: parseFloat(document.getElementById('o-in').value) || 0,
+        amount_out: parseFloat(document.getElementById('o-out').value) || 0
+      };
+      if (!data.description) { toast('กรุณาระบุรายการ', 'error'); return; }
+      
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success) { toast(res.message, 'success'); closeModal(); loadOffBudget(); }
+        else toast(res.message, 'error');
+      }).saveOffBudget(TOKEN, data);
+    }
+    
+    // ===== DAILY BALANCE =====
+    function loadDailyBalance() {
+      var tbody = document.getElementById('tbl-daily');
+      tbody.innerHTML = '<tr><td colspan="5"><div class="loading"><span class="spinner"></span>กำลังโหลด...</div></td></tr>';
+      var from = document.getElementById('daily-from').value;
+      var to = document.getElementById('daily-to').value;
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res.success) return;
+        if (!res.data.length) {
+          tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="title">ไม่มีข้อมูลในช่วงวันที่เลือก</div></div></td></tr>';
+          return;
+        }
+        tbody.innerHTML = res.data.map(function(d) {
+          return '<tr>' +
+            '<td>' + d.date + '</td>' +
+            '<td>' + fmtMoney(d.opening) + '</td>' +
+            '<td style="color:var(--success)">' + fmtMoney(d.in) + '</td>' +
+            '<td style="color:var(--danger)">' + fmtMoney(d.out) + '</td>' +
+            '<td><strong>' + fmtMoney(d.closing) + '</strong></td>' +
+          '</tr>';
+        }).join('');
+      }).getDailyBalanceReport(TOKEN, from, to);
+    }
+    
+    // ===== USERS =====
+    function loadUsers() {
+      var tbody = document.getElementById('tbl-users');
+      tbody.innerHTML = '<tr><td colspan="6"><div class="loading"><span class="spinner"></span>กำลังโหลด...</div></td></tr>';
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res.success) { toast(res.message, 'error'); return; }
+        CACHE.users = res.data;
+        tbody.innerHTML = res.data.map(function(u) {
+          return '<tr>' +
+            '<td><strong>' + escape(u.username) + '</strong></td>' +
+            '<td>' + escape(u.fullname || '-') + '</td>' +
+            '<td><span class="badge badge-approved">' + (ROLE_LABELS[u.role] || u.role) + '</span></td>' +
+            '<td>' + escape(u.department || '-') + '</td>' +
+            '<td>' + (u.active ? '<span class="badge badge-approved">ใช้งาน</span>' : '<span class="badge badge-rejected">ปิด</span>') + '</td>' +
+            '<td><button class="btn btn-primary btn-sm" onclick="openUserModal(\'' + u.id + '\')">แก้ไข</button></td>' +
+          '</tr>';
+        }).join('');
+      }).getUsers(TOKEN);
+    }
+    
+    function openUserModal(id) {
+      var u = id ? CACHE.users.find(function(x) { return x.id === id; }) : {};
+      if (!u) u = {};
+      var html = '<div class="modal-header">' +
+        '<h3 class="modal-title">' + (id ? 'แก้ไขผู้ใช้' : 'เพิ่มผู้ใช้ใหม่') + '</h3>' +
+        '<button class="modal-close" onclick="closeModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
+      '</div><div class="modal-body">' +
+        '<div class="form-row">' +
+          '<div class="form-group-modal"><label>ชื่อผู้ใช้ *</label><input id="u-username" value="' + (u.username || '') + '" ' + (id ? 'readonly' : '') + '></div>' +
+          '<div class="form-group-modal"><label>รหัสผ่าน ' + (id ? '(เว้นว่าง = ไม่เปลี่ยน)' : '*') + '</label><input id="u-password" type="password"></div>' +
+        '</div>' +
+        '<div class="form-group-modal"><label>ชื่อ-นามสกุล *</label><input id="u-fullname" value="' + (u.fullname || '') + '"></div>' +
+        '<div class="form-row">' +
+          '<div class="form-group-modal"><label>บทบาท</label><select id="u-role"><option value="staff">เจ้าหน้าที่</option><option value="head">หัวหน้าการเงิน</option><option value="director">ผู้อำนวยการ</option></select></div>' +
+          '<div class="form-group-modal"><label>แผนก</label><input id="u-dept" value="' + (u.department || '') + '"></div>' +
+        '</div>' +
+        '<div class="form-row">' +
+          '<div class="form-group-modal"><label>Email</label><input id="u-email" type="email" value="' + (u.email || '') + '"></div>' +
+          '<div class="form-group-modal"><label>เบอร์โทร</label><input id="u-phone" value="' + (u.phone || '') + '"></div>' +
+        '</div>' +
+      '</div><div class="modal-footer">' +
+        '<button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>' +
+        '<button class="btn btn-primary" onclick="saveUser(\'' + (id || '') + '\')">บันทึก</button>' +
+      '</div>';
+      showModal(html);
+      if (u.role) document.getElementById('u-role').value = u.role;
+    }
+    
+    function saveUser(id) {
+      var data = {
+        id: id || null,
+        username: document.getElementById('u-username').value.trim(),
+        password: document.getElementById('u-password').value,
+        fullname: document.getElementById('u-fullname').value.trim(),
+        role: document.getElementById('u-role').value,
+        department: document.getElementById('u-dept').value.trim(),
+        email: document.getElementById('u-email').value.trim(),
+        phone: document.getElementById('u-phone').value.trim()
+      };
+      if (!data.fullname) { toast('กรุณาระบุชื่อ-นามสกุล', 'error'); return; }
+      if (!id && (!data.username || !data.password)) { toast('กรุณาระบุชื่อผู้ใช้และรหัสผ่าน', 'error'); return; }
+      
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success) { toast(res.message, 'success'); closeModal(); loadUsers(); }
+        else toast(res.message, 'error');
+      }).saveUser(TOKEN, data);
+    }
+    
+    // ===== UTILITIES =====
+    function showModal(html) {
+      document.getElementById('modalContent').innerHTML = html;
+      document.getElementById('modalOverlay').classList.add('show');
+    }
+    
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('show');
+    }
+    
+    function toast(msg, type) {
+      type = type || 'info';
+      var icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
+      var el = document.createElement('div');
+      el.className = 'toast ' + type;
+      el.innerHTML = '<span class="toast-icon">' + icons[type] + '</span><span class="toast-msg">' + escape(msg) + '</span>';
+      document.getElementById('toastContainer').appendChild(el);
+      setTimeout(function() { el.style.opacity = '0'; setTimeout(function() { el.remove(); }, 300); }, 3500);
+    }
+    
+    function escape(s) {
+      if (s === null || s === undefined) return '';
+      return String(s).replace(/[&<>"']/g, function(c) {
+        return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+      });
+    }
+    
+    function fmtMoney(n) {
+      return (parseFloat(n) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    
+    function fmtDate(d) {
+      if (!d) return '-';
+      try {
+        var dt = new Date(d);
+        if (isNaN(dt)) return d;
+        return dt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+      } catch(e) { return d; }
+    }
+    
+    function fmtDateInput(d) {
+      if (!d) return '';
+      try {
+        var dt = new Date(d);
+        if (isNaN(dt)) return '';
+        var y = dt.getFullYear();
+        var m = String(dt.getMonth() + 1).padStart(2, '0');
+        var day = String(dt.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + day;
+      } catch(e) { return ''; }
+    }
+    
+    function exportTable(tbodyId, filename) {
+      var tbody = document.getElementById(tbodyId);
+      var table = tbody.closest('table');
+      var rows = [];
+      table.querySelectorAll('tr').forEach(function(tr) {
+        var row = [];
+        tr.querySelectorAll('th, td').forEach(function(c) { row.push('"' + c.textContent.trim().replace(/"/g, '""') + '"'); });
+        rows.push(row.join(','));
+      });
+      var csv = '\uFEFF' + rows.join('\n');
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      var link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+      link.click();
+      toast('Export สำเร็จ', 'success');
     }
   </script>
 </body>
