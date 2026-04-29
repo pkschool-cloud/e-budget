@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แดชบอร์ดงบประมาณ - โรงเรียนป่าก้าง</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ตั้งค่าฟอนต์หลัก */
+    body { 
+      font-family: 'Prompt', sans-serif; 
+      background-color: #f8fafc; /* พื้นหลังสีเทาอมฟ้าสว่างๆ */
+      overflow: hidden;
+    }
+    
+    /* ซ่อน Scrollbar แต่ยังเลื่อนได้ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* อนิเมชั่นต่างๆ */
+    .smooth-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02); }
+    
+    /* แถบเมนูย่อย (Accordion) */
+    .submenu { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out; }
+    .submenu.open { max-height: 200px; }
+    .rotate-icon { transform: rotate(180deg); transition: transform 0.3s ease; }
+  </style>
+</head>
+<body class="flex h-screen text-slate-800">
+
+  <aside class="w-72 bg-[#0f172a] text-slate-300 flex flex-col shadow-2xl z-20">
+    <div class="p-6 flex items-center gap-4 border-b border-slate-700/50">
+      <div class="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+        <i class="fa-solid fa-school-flag text-white text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-white font-semibold text-lg leading-tight tracking-wide">โรงเรียนป่าก้าง</h1>
+        <p class="text-xs text-indigo-300 mt-0.5">ระบบการเงินสถานศึกษา สพฐ.</p>
+      </div>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+      
+      <div class="mb-4">
+        <button onclick="toggleMenu('menu-overview', 'icon-overview')" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-800 smooth-transition text-slate-200">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-chart-pie w-5 text-center text-indigo-400"></i>
+            <span class="font-medium text-sm">ภาพรวมระบบ</span>
+          </div>
+          <i id="icon-overview" class="fa-solid fa-chevron-down text-xs rotate-icon"></i>
+        </button>
+        <div id="menu-overview" class="submenu open pl-11 pr-3 flex flex-col gap-1 mt-1">
+          <a href="#" class="py-2.5 px-3 rounded-lg bg-indigo-500/10 text-indigo-400 font-medium text-sm border-l-2 border-indigo-500 smooth-transition">
+            แดชบอร์ดงบประมาณ
+          </a>
+        </div>
+      </div>
+
+      <div class="mb-2">
+        <button onclick="toggleMenu('menu-plan', 'icon-plan')" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-800 smooth-transition">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-list-check w-5 text-center text-slate-400"></i>
+            <span class="font-medium text-sm">1. ระบบแผนปฏิบัติการ</span>
+          </div>
+          <i id="icon-plan" class="fa-solid fa-chevron-down text-xs"></i>
+        </button>
+        <div id="menu-plan" class="submenu pl-11 pr-3 flex flex-col gap-1 mt-1">
+          <a href="#" class="py-2 px-3 rounded-lg hover:bg-slate-800 hover:text-white text-slate-400 text-sm smooth-transition">1.1 จัดทำโครงการ / ขออนุมัติ</a>
+          <a href="#" class="py-2 px-3 rounded-lg hover:bg-slate-800 hover:text-white text-slate-400 text-sm smooth-transition">1.2 ทะเบียนคุมโครงการ</a>
+        </div>
+      </div>
+
+      <div class="mb-2">
+        <button onclick="toggleMenu('menu-finance', 'icon-finance')" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-800 smooth-transition">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-coins w-5 text-center text-slate-400"></i>
+            <span class="font-medium text-sm">2. ระบบการเงิน</span>
+          </div>
+          <i id="icon-finance" class="fa-solid fa-chevron-down text-xs"></i>
+        </button>
+        <div id="menu-finance" class="submenu pl-11 pr-3 flex flex-col gap-1 mt-1">
+          <a href="#" class="py-2 px-3 rounded-lg hover:bg-slate-800 hover:text-white text-slate-400 text-sm smooth-transition">2.1 บันทึกรับเงินรายได้</a>
+          <a href="#" class="py-2 px-3 rounded-lg hover:bg-slate-800 hover:text-white text-slate-400 text-sm smooth-transition">2.2 ขออนุมัติเบิกจ่ายเงิน</a>
+        </div>
+      </div>
+
+      <div class="mb-2">
+        <button onclick="toggleMenu('menu-account', 'icon-account')" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-800 smooth-transition">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-book-bookmark w-5 text-center text-slate-400"></i>
+            <span class="font-medium text-sm">3. ระบบบัญชี (อิง 2544)</span>
+          </div>
+          <i id="icon-account" class="fa-solid fa-chevron-down text-xs"></i>
+        </button>
+        <div id="menu-account" class="submenu pl-11 pr-3 flex flex-col gap-1 mt-1">
+          <a href="#" class="py-2 px-3 rounded-lg hover:bg-slate-800 hover:text-white text-slate-400 text-sm smooth-transition">3.1 ทะเบียนคุมเงินนอกงบฯ</a>
+          <a href="#" class="py-2 px-3 rounded-lg hover:bg-slate-800 hover:text-white text-slate-400 text-sm smooth-transition">3.2 รายงานเงินคงเหลือประจำวัน</a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="flex-1 flex flex-col overflow-y-auto relative bg-[#f8fafc]">
+    
+    <header class="bg-white/80 backdrop-blur-lg border-b border-slate-200 sticky top-0 z-10 px-8 py-5 flex justify-between items-center">
+      <div>
+        <h2 class="text-2xl font-bold text-slate-800">แดชบอร์ดงบประมาณ</h2>
+        <p class="text-sm text-slate-500 font-medium mt-1">สรุปภาพรวมทางการเงินและการเบิกจ่ายโครงการ</p>
+      </div>
+      
+      <button onclick="syncData()" id="syncBtn" class="flex items-center gap-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white px-5 py-2.5 rounded-full font-medium text-sm smooth-transition border border-indigo-100 hover:border-indigo-600 shadow-sm">
+        <i id="syncIcon" class="fa-solid fa-rotate-right"></i>
+        <span>ซิงค์ข้อมูลล่าสุด</span>
+      </button>
+    </header>
+
+    <div class="p-8 pt-6 max-w-7xl mx-auto w-full">
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 card-hover smooth-transition relative overflow-hidden group">
+          <div class="absolute right-0 top-0 w-24 h-24 bg-emerald-50 rounded-bl-full -z-10 group-hover:scale-125 smooth-transition"></div>
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-sm font-medium text-slate-500">เงินงบประมาณรับเข้า</p>
+            <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600"><i class="fa-solid fa-arrow-down"></i></div>
+          </div>
+          <h3 class="text-3xl font-bold text-slate-800">1,250,000<span class="text-lg text-slate-400 font-medium">.00</span></h3>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 card-hover smooth-transition relative overflow-hidden group">
+          <div class="absolute right-0 top-0 w-24 h-24 bg-indigo-50 rounded-bl-full -z-10 group-hover:scale-125 smooth-transition"></div>
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-sm font-medium text-slate-500">ตั้งงบโครงการทั้งหมด</p>
+            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600"><i class="fa-solid fa-folder-open"></i></div>
+          </div>
+          <h3 class="text-3xl font-bold text-slate-800">850,000<span class="text-lg text-slate-400 font-medium">.00</span></h3>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 card-hover smooth-transition relative overflow-hidden group">
+          <div class="absolute right-0 top-0 w-24 h-24 bg-rose-50 rounded-bl-full -z-10 group-hover:scale-125 smooth-transition"></div>
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-sm font-medium text-slate-500">เบิกจ่ายจริงทั้งหมด</p>
+            <div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600"><i class="fa-solid fa-arrow-up"></i></div>
+          </div>
+          <h3 class="text-3xl font-bold text-slate-800">324,500<span class="text-lg text-slate-400 font-medium">.00</span></h3>
+        </div>
+
+        <div class="bg-slate-800 rounded-2xl p-6 border border-slate-700 card-hover smooth-transition relative overflow-hidden shadow-lg">
+          <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+          <div class="flex items-center justify-between mb-4 relative z-10">
+            <p class="text-sm font-medium text-slate-300">เงินคงเหลือสุทธิบัญชี</p>
+            <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-white border border-slate-600"><i class="fa-solid fa-vault"></i></div>
+          </div>
+          <h3 class="text-3xl font-bold text-white relative z-10">925,500<span class="text-lg text-slate-400 font-medium">.00</span></h3>
+        </div>
+
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-10">
+        
+        <div class="bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+          <div class="flex justify-between items-center mb-6">
+            <h4 class="text-base font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-chart-bar text-indigo-500"></i> ความคืบหน้าโครงการ (Top 5)
+            </h4>
+            <a href="#" class="text-xs font-medium text-indigo-600 hover:text-indigo-800">ดูทั้งหมด</a>
+          </div>
+          
+          <div class="space-y-6">
+            <div>
+              <div class="flex justify-between items-end mb-2">
+                <span class="text-sm font-medium text-slate-700 truncate pr-4">1. โครงการยกระดับผลสัมฤทธิ์ทางการเรียน O-Net NT และ RT</span>
+                <span class="text-sm font-bold text-indigo-600">85%</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2.5">
+                <div class="bg-indigo-500 h-2.5 rounded-full" style="width: 85%"></div>
+              </div>
+              <p class="text-xs text-slate-400 mt-1.5">เบิกแล้ว 42,500 / ตั้งงบ 50,000</p>
+            </div>
+            
+            <div>
+              <div class="flex justify-between items-end mb-2">
+                <span class="text-sm font-medium text-slate-700 truncate pr-4">2. โครงการปรับปรุงภูมิทัศน์และแหล่งเรียนรู้</span>
+                <span class="text-sm font-bold text-indigo-600">60%</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2.5">
+                <div class="bg-indigo-500 h-2.5 rounded-full" style="width: 60%"></div>
+              </div>
+              <p class="text-xs text-slate-400 mt-1.5">เบิกแล้ว 60,000 / ตั้งงบ 100,000</p>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-end mb-2">
+                <span class="text-sm font-medium text-slate-700 truncate pr-4">3. โครงการสนับสนุนค่าใช้จ่ายในการจัดการศึกษา (เรียนฟรี 15 ปี)</span>
+                <span class="text-sm font-bold text-indigo-600">45%</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2.5">
+                <div class="bg-indigo-500 h-2.5 rounded-full" style="width: 45%"></div>
+              </div>
+              <p class="text-xs text-slate-400 mt-1.5">เบิกแล้ว 135,000 / ตั้งงบ 300,000</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+          <div class="flex justify-between items-center mb-6">
+            <h4 class="text-base font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-clock-rotate-left text-slate-500"></i> รายการเคลื่อนไหวล่าสุด
+            </h4>
+            <a href="#" class="text-xs font-medium text-indigo-600 hover:text-indigo-800">ดูทั้งหมด</a>
+          </div>
+          
+          <div class="space-y-4">
+            
+            <div class="flex justify-between items-center p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 smooth-transition cursor-pointer">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500"><i class="fa-solid fa-file-invoice"></i></div>
+                <div>
+                  <p class="text-sm font-medium text-slate-800">เบิกจ่ายค่าวัสดุการศึกษา (โครงการ O-Net)</p>
+                  <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-calendar-check mr-1"></i>28 เม.ย. 2526 • 10:04</p>
+                </div>
+              </div>
+              <span class="text-sm font-bold text-rose-500">-4,500.00</span>
+            </div>
+
+            <div class="flex justify-between items-center p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 smooth-transition cursor-pointer">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                <div>
+                  <p class="text-sm font-medium text-slate-800">รับเงินอุดหนุนรายหัว ภาคเรียนที่ 1/2526</p>
+                  <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-calendar-check mr-1"></i>25 เม.ย. 2526 • 14:30</p>
+                </div>
+              </div>
+              <span class="text-sm font-bold text-emerald-500">+450,000.00</span>
+            </div>
+
+            <div class="flex justify-between items-center p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 smooth-transition cursor-pointer">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500"><i class="fa-solid fa-chalkboard-user"></i></div>
+                <div>
+                  <p class="text-sm font-medium text-slate-800">เบิกจ่ายค่าตอบแทนวิทยากรภายนอก</p>
+                  <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-calendar-check mr-1"></i>22 เม.ย. 2526 • 09:15</p>
+                </div>
+              </div>
+              <span class="text-sm font-bold text-rose-500">-12,000.00</span>
+            </div>
+
+            <div class="flex justify-between items-center p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 smooth-transition cursor-pointer">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500"><i class="fa-solid fa-hammer"></i></div>
+                <div>
+                  <p class="text-sm font-medium text-slate-800">จ่ายค่าจ้างเหมาซ่อมแซมอาคารเรียน</p>
+                  <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-calendar-check mr-1"></i>20 เม.ย. 2526 • 11:00</p>
+                </div>
+              </div>
+              <span class="text-sm font-bold text-rose-500">-25,000.00</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ฟังก์ชันยืด-หด แถบเมนูด้านซ้าย (Accordion)
+    function toggleMenu(menuId, iconId) {
+      const menu = document.getElementById(menuId);
+      const icon = document.getElementById(iconId);
+      
+      if (menu.classList.contains('open')) {
+        menu.classList.remove('open');
+        icon.classList.remove('rotate-icon');
+      } else {
+        // ปิดเมนูอื่นก่อน (ถ้าต้องการให้เปิดได้ทีละอัน)
+        document.querySelectorAll('.submenu').forEach(el => el.classList.remove('open'));
+        document.querySelectorAll('.fa-chevron-down').forEach(el => el.classList.remove('rotate-icon'));
+        
+        // เปิดเมนูที่คลิก
+        menu.classList.add('open');
+        icon.classList.add('rotate-icon');
+      }
+    }
+
+    // ฟังก์ชันจำลองการโหลดข้อมูล (ปุ่มซิงค์)
+    function syncData() {
+      const btn = document.getElementById('syncBtn');
+      const icon = document.getElementById('syncIcon');
+      
+      // เพิ่มคลาสให้ไอคอนหมุน
+      icon.classList.add('fa-spin');
+      btn.classList.add('opacity-80');
+      
+      // จำลองเวลาโหลด 1 วินาที
+      setTimeout(() => {
+        icon.classList.remove('fa-spin');
+        btn.classList.remove('opacity-80');
+        
+        // แสดง Alert เล็กๆ มุมขวาบนแบบ Tailwind (จำลอง)
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-5 right-5 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg font-medium text-sm smooth-transition z-50 transform translate-y-[-20px] opacity-0';
+        toast.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i> อัปเดตข้อมูลล่าสุดสำเร็จ';
+        document.body.appendChild(toast);
+        
+        // แอนิเมชั่น Toast โผล่มา
+        setTimeout(() => {
+          toast.classList.remove('translate-y-[-20px]', 'opacity-0');
+        }, 10);
+        
+        // แอนิเมชั่น Toast หายไป
+        setTimeout(() => {
+          toast.classList.add('translate-y-[-20px]', 'opacity-0');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+        
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
