@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ระบบการเงินสถานศึกษา</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Sarabun', sans-serif; background-color: #f4f5f9; }
+    .sidebar-bg { background-color: #1a1c2a; }
+    .sidebar-active { background-color: #2b2e42; border-left: 4px solid #5a67d8; }
+  </style>
+</head>
+<body>
+
+  <div id="loginPage" class="min-h-screen flex items-center justify-center bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-md w-96">
+      <div class="text-center mb-6">
+        <i class="fa-solid fa-school text-indigo-600 text-4xl mb-2"></i>
+        <h2 class="text-2xl font-bold text-gray-800">เข้าสู่ระบบ</h2>
+        <p class="text-sm text-gray-500">ระบบการเงินสถานศึกษา</p>
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2">ชื่อผู้ใช้งาน</label>
+        <input id="username" type="text" class="w-full px-3 py-2 border rounded-md" placeholder="admin">
+      </div>
+      <div class="mb-6">
+        <label class="block text-gray-700 text-sm font-bold mb-2">รหัสผ่าน</label>
+        <input id="password" type="password" class="w-full px-3 py-2 border rounded-md" placeholder="1234">
+      </div>
+      <button onclick="handleLogin()" id="loginBtn" class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-indigo-700">
+        เข้าสู่ระบบ
+      </button>
+      <p id="loginError" class="text-red-500 text-sm text-center mt-3 hidden"></p>
+    </div>
+  </div>
+
+  <div id="dashboardPage" class="hidden flex h-screen overflow-hidden">
+    
+    <aside class="w-64 sidebar-bg text-gray-300 flex flex-col">
+      <div class="p-5 flex items-center gap-3 border-b border-gray-700">
+        <i class="fa-solid fa-school text-indigo-400 text-2xl"></i>
+        <div>
+          <h1 class="text-white font-bold leading-tight">ระบบการเงิน</h1>
+          <p class="text-xs text-gray-400">อิงระเบียบ สพฐ.</p>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto py-4">
+        <div class="px-4 py-2 text-sm text-gray-400 flex justify-between items-center cursor-pointer">
+          <span><i class="fa-solid fa-chart-pie w-5"></i> ภาพรวมระบบ</span>
+        </div>
+        <div class="sidebar-active text-white py-2 px-10 cursor-pointer text-sm">แดชบอร์ดงบประมาณ</div>
+      </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-y-auto">
+      <header class="bg-white px-8 py-4 shadow-sm flex justify-between items-center">
+        <h2 class="text-xl font-bold text-gray-800">แดชบอร์ดงบประมาณ</h2>
+      </header>
+
+      <div class="p-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-green-500">
+            <p class="text-sm text-gray-500 mb-1">เงินงบประมาณรับเข้า</p>
+            <h3 class="text-2xl font-bold text-green-600" id="val-income">0.00</h3>
+          </div>
+          <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-indigo-500">
+            <p class="text-sm text-gray-500 mb-1">ตั้งงบโครงการทั้งหมด</p>
+            <h3 class="text-2xl font-bold text-indigo-600" id="val-project">0.00</h3>
+          </div>
+          <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-red-500">
+            <p class="text-sm text-gray-500 mb-1">เบิกจ่ายจริงทั้งหมด</p>
+            <h3 class="text-2xl font-bold text-red-500" id="val-expense">0.00</h3>
+          </div>
+          <div class="bg-[#1e2235] p-5 rounded-lg shadow-sm">
+            <p class="text-sm text-gray-400 mb-1">เงินคงเหลือสุทธิบัญชี</p>
+            <h3 class="text-2xl font-bold text-white" id="val-balance">0.00</h3>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white rounded-lg p-6 border border-gray-100">
+            <h4 class="text-sm font-bold text-gray-700 mb-4 border-b pb-2">ความคืบหน้าโครงการ</h4>
+            <div id="project-list"></div>
+          </div>
+          <div class="bg-white rounded-lg p-6 border border-gray-100">
+            <h4 class="text-sm font-bold text-gray-700 mb-4 border-b pb-2">รายการเคลื่อนไหวล่าสุด</h4>
+            <div id="transaction-list"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function handleLogin() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      
+      google.script.run.withSuccessHandler(function(res) {
+        if(res.success) {
+          document.getElementById('loginPage').classList.add('hidden');
+          document.getElementById('dashboardPage').classList.remove('hidden');
+          loadDashboardData();
+        } else {
+          document.getElementById('loginError').innerText = res.message;
+          document.getElementById('loginError').classList.remove('hidden');
+        }
+      }).verifyLogin(user, pass);
+    }
+
+    function loadDashboardData() {
+      google.script.run.withSuccessHandler(function(data) {
+        document.getElementById('val-income').innerText = data.kpi.income;
+        document.getElementById('val-project').innerText = data.kpi.projectBudget;
+        document.getElementById('val-expense').innerText = data.kpi.expense;
+        document.getElementById('val-balance').innerText = data.kpi.balance;
+
+        let projHtml = '';
+        data.topProjects.forEach(p => {
+          projHtml += `<div class="mb-4 text-sm"><div class="flex justify-between mb-1"><span>${p.name}</span><span>${p.progress}%</span></div><div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-indigo-400 h-2 rounded-full" style="width: ${p.progress}%"></div></div></div>`;
+        });
+        document.getElementById('project-list').innerHTML = projHtml;
+
+        let txHtml = '';
+        data.recentTransactions.forEach(t => {
+          txHtml += `<div class="flex justify-between text-sm mb-3 border-b pb-2"><div><p>${t.desc}</p><p class="text-xs text-gray-400">${t.date}</p></div><span class="text-red-500 font-bold">${t.amount}</span></div>`;
+        });
+        document.getElementById('transaction-list').innerHTML = txHtml;
+
+      }).getDashboardData();
+    }
+  </script>
+</body>
+</html>
